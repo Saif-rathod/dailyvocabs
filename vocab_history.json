@@ -1,20 +1,6 @@
 {
-  "sent_vocabs": [
-    "verdant - green with grass or other rich vegetation",
-    "inexorable - impossible to stop or prevent"
-  ],
-  "last_sent_date": "2025-04-06",
-  "review_queue": [
-    {
-      "vocab": "verdant - green with grass or other rich vegetation",
-      "review_date": "2025-04-07",
-      "times_reviewed": 0
-    },
-    {
-      "vocab": "inexorable - impossible to stop or prevent",
-      "review_date": "2025-04-07",
-      "times_reviewed": 0
-    }
-  ],
+  "sent_vocabs": [],
+  "last_sent_date": null,
+  "review_queue": [],
   "mastered_vocabs": []
 }
