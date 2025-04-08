@@ -136,7 +136,6 @@ def send_daily_vocab():
     message += f"🌟 Daily Phrase: \"{daily_phrase}\"  \n"
     message += f"💡 Meaning: {phrase_meaning}"
     
-    # Send the message
     success = whatsapp_sender.send_message(message) 
     
     if success:
