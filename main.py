@@ -129,7 +129,7 @@ def send_daily_vocab():
     # Format the message with the requested template
     message = f"📅 Date: {today}  \n"
     message += f"📦 Word Capsule #{word_capsule_number}\n\n"
-    message += f"🔤 Word: **{word.upper()}**  \n"
+    message += f"🔤 Word: {word.upper()} \n"
     message += f"📚 Meaning: {definition}  \n"
     message += f"✍️ Example: \"{example}\"  \n"
     message += f"💭 Context Tip: {context_tip}\n\n"
@@ -137,7 +137,7 @@ def send_daily_vocab():
     message += f"💡 Meaning: {phrase_meaning}"
     
     # Send the message
-    success = whatsapp_sender.send_message(message)
+    success = whatsapp_sender.send_message(message) 
     
     if success:
         # Mark both vocab and phrase as sent only if the message was sent successfully
