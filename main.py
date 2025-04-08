@@ -176,52 +176,32 @@ def is_github_actions():
     return os.environ.get('GITHUB_ACTIONS') == 'true'
 
 def main():
-    parser = argparse.ArgumentParser(description='Daily Vocabulary WhatsApp Sender')
-    parser.add_argument('--send', action='store_true', help='Send vocabulary immediately')
-    parser.add_argument('--review', action='store_true', help='Send review words')
+    """Main function to run the vocabulary sender"""
+    parser = argparse.ArgumentParser(description='Send vocabulary words via WhatsApp')
+    parser.add_argument('--send', action='store_true', help='Send a vocabulary word now')
+    parser.add_argument('--review', action='store_true', help='Review words from the last 7 days')
     parser.add_argument('--interactive', action='store_true', help='Run in interactive mode')
-    parser.add_argument('--time', type=str, default="08:00", help='Daily sending time (default: 08:00)')
-    
+    parser.add_argument('--time', type=str, default="08:00", help='Daily sending time in 24-hour format (default: 08:00)')
     args = parser.parse_args()
     
-    if args.interactive:
-        interactive_mode()
-        return
-    
     if args.send:
-        manual_send()
-        return
-    
-    if args.review:
-        review_words()
-        return
-    
-    # Skip scheduler if running in GitHub Actions
-    if is_github_actions():
-        print("Running in GitHub Actions environment. Sending vocabulary and exiting.")
         send_daily_vocab()
-        return
-    
-    print("Starting Daily Vocab WhatsApp Sender...")
-    print(f"Scheduled to run daily at {args.time}")
-    print("Press Ctrl+C to exit")
-    
-    # Schedule to run at the specified time every day
-    schedule.every().day.at(args.time).do(send_daily_vocab)
-    
-    # Also schedule review check 30 minutes later
-    review_time = datetime.datetime.strptime(args.time, "%H:%M") + datetime.timedelta(minutes=30)
-    review_time_str = review_time.strftime("%H:%M")
-    schedule.every().day.at(review_time_str).do(review_words)
-    
-    # Send immediately on start for testing
-    print("Sending test vocabulary now...")
-    send_daily_vocab()
-    
-    # Run the scheduler
-    while True:
-        schedule.run_pending()
-        time.sleep(60)  # Check every minute
+    elif args.review:
+        review_words()
+    elif args.interactive:
+        interactive_mode()
+    else:
+        # Schedule daily vocabulary at 8:00 AM IST
+        schedule.every().day.at(args.time).do(send_daily_vocab)
+        
+        # Schedule review check 30 minutes after main send
+        review_time = (datetime.datetime.strptime(args.time, "%H:%M") + datetime.timedelta(minutes=30)).strftime("%H:%M")
+        schedule.every().day.at(review_time).do(review_words)
+        
+        print(f"Scheduler started. Messages will be sent at {args.time} IST. Press Ctrl+C to exit.")
+        while True:
+            schedule.run_pending()
+            time.sleep(60)
 
 if __name__ == "__main__":
     main() 
