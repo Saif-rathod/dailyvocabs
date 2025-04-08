@@ -31,7 +31,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      - name: Send daily vocabulary
+      - name: Send daily vocabulary and phrase
         env:
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
@@ -39,18 +39,10 @@ jobs:
           RECIPIENT_WHATSAPP_NUMBER: ${{ secrets.RECIPIENT_WHATSAPP_NUMBER }}
         run: python main.py --send
       
-      - name: Send review words (30 minutes later)
-        env:
-          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_WHATSAPP_NUMBER: ${{ secrets.TWILIO_WHATSAPP_NUMBER }}
-          RECIPIENT_WHATSAPP_NUMBER: ${{ secrets.RECIPIENT_WHATSAPP_NUMBER }}
-        run: python main.py --review
-      
-      - name: Update repository with learning progress
+      - name: Update repository with sent words and phrases
         run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add vocab_history.json
-          git commit -m "Update vocabulary learning progress" || echo "No changes to commit"
-          git push origin main || git push origin master 
+          git commit -m "Update vocabulary and phrase history"
+          git push 

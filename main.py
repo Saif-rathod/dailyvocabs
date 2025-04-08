@@ -3,202 +3,163 @@ import time
 import datetime
 import os
 import argparse
-import random
 from vocab_manager import VocabManager
 from whatsapp_sender import WhatsAppSender
 
-def format_progress_bar(current, total, width=20):
-    """Create a progress bar for visualization"""
-    percent = current / total
-    filled_len = int(width * percent)
-    bar = '█' * filled_len + '░' * (width - filled_len)
-    return f"[{bar}] {int(percent * 100)}%"
-
-def send_daily_vocab(is_review=False):
-    """Send a daily vocabulary word via WhatsApp"""
+def send_daily_vocab():
+    """Send a daily vocabulary word and phrase via WhatsApp"""
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     
     # Initialize managers
     vocab_manager = VocabManager()
     whatsapp_sender = WhatsAppSender()
     
-    # Get vocabulary (new or review)
+    # Get vocabulary
     vocab = vocab_manager.get_random_vocab()
     word = vocab.split(' - ')[0]
     definition = vocab.split(' - ')[1]
     
-    # Check if this is a review word
-    is_review_word = vocab in vocab_manager.get_review_words()
-    
-    # Calculate word difficulty
-    difficulty = vocab_manager.get_word_difficulty(word)
-    difficulty_stars = '★' * difficulty + '☆' * (10 - difficulty)
-    
-    # Generate example sentence
+    # Get word information
+    word_family = vocab_manager.get_word_family(word)
     example = vocab_manager.generate_example_sentence(word)
     
-    # Track progress
-    learned = len(vocab_manager.history["sent_vocabs"])
-    mastered = vocab_manager.get_mastered_count()
-    total = vocab_manager.get_vocab_count()
-    progress_bar = format_progress_bar(learned, total)
+    # Get sent count for word capsule number
+    word_capsule_number = len(vocab_manager.history["sent_vocabs"]) + 1
     
-    # Format the message with enhanced styling
-    message = f"📚 *DAILY VOCABULARY - {today}* 📚\n\n"
+    # Daily phrases collection
+    daily_phrases = [
+        # Happiness & Success
+        ("On cloud nine", "Feeling extremely happy or elated"),
+        ("Over the moon", "Very happy or delighted"),
+        ("On top of the world", "Feeling extremely successful and happy"),
+        ("In seventh heaven", "In a state of extreme happiness"),
+        ("Walking on air", "Feeling very happy and excited"),
+        
+        # Time & Speed
+        ("In the blink of an eye", "Very quickly, almost instantly"),
+        ("In a jiffy", "Very quickly"),
+        ("In the nick of time", "Just in time, at the last possible moment"),
+        ("Time flies", "Time passes very quickly"),
+        ("Kill time", "To do something to make time pass more quickly"),
+        
+        # Work & Effort
+        ("Burning the midnight oil", "Working late into the night"),
+        ("Go the extra mile", "To make a special effort to achieve something"),
+        ("Pull your weight", "To do your fair share of work"),
+        ("Put your nose to the grindstone", "To work very hard"),
+        ("Work like a charm", "To work very well or effectively"),
+        
+        # Difficulty & Challenge
+        ("A piece of cake", "Something very easy to do"),
+        ("A walk in the park", "Something very easy to do"),
+        ("A tough nut to crack", "A difficult problem to solve"),
+        ("Between a rock and a hard place", "In a difficult situation with no good options"),
+        ("Up a creek without a paddle", "In a difficult situation with no help"),
+        
+        # Luck & Success
+        ("Break a leg", "Good luck (especially before a performance)"),
+        ("Hit the jackpot", "To have great success or luck"),
+        ("Strike gold", "To find something valuable or successful"),
+        ("The sky's the limit", "There are no limits to what can be achieved"),
+        ("On a roll", "Experiencing a period of success"),
+        
+        # Accuracy & Understanding
+        ("Hit the nail on the head", "To be exactly right about something"),
+        ("Get the picture", "To understand the situation"),
+        ("Read between the lines", "To understand the hidden meaning"),
+        ("Put two and two together", "To figure something out"),
+        ("Dot your i's and cross your t's", "To be very careful and thorough"),
+        
+        # Health & Feelings
+        ("Under the weather", "Feeling sick or unwell"),
+        ("On pins and needles", "Very nervous or anxious"),
+        ("Down in the dumps", "Feeling sad or depressed"),
+        ("Over the hill", "Getting old"),
+        ("Fit as a fiddle", "In very good health"),
+        
+        # Communication
+        ("Spill the beans", "To reveal a secret"),
+        ("Pull someone's leg", "To tease or joke with someone"),
+        ("Beat around the bush", "To avoid talking about something directly"),
+        ("Get straight to the point", "To talk about the most important thing immediately"),
+        ("Put in a good word", "To say something positive about someone"),
+        
+        # Decision & Action
+        ("The ball is in your court", "It's your turn to take action"),
+        ("Cross that bridge when you come to it", "Deal with a problem when it happens"),
+        ("Take the bull by the horns", "To deal with a problem directly"),
+        ("Jump on the bandwagon", "To join a popular trend"),
+        ("Throw in the towel", "To give up or surrender"),
+        
+        # Surprise & Revelation
+        ("Bite the bullet", "To endure a painful situation bravely"),
+        ("Let the cat out of the bag", "To reveal a secret accidentally"),
+        ("The penny dropped", "To finally understand something"),
+        ("Light at the end of the tunnel", "Hope that a difficult situation will end soon"),
+        ("Turn over a new leaf", "To start behaving in a better way"),
+        
+        # Frequency & Rarity
+        ("Once in a blue moon", "Very rarely"),
+        ("Every now and then", "Occasionally"),
+        ("Day in, day out", "Every day without change"),
+        ("From time to time", "Occasionally"),
+        ("Once in a lifetime", "Very rarely, perhaps only once"),
+        
+        # Relationships
+        ("Get along like a house on fire", "To have a very good relationship"),
+        ("See eye to eye", "To agree with someone"),
+        ("Bury the hatchet", "To make peace with someone"),
+        ("Go back to square one", "To start something again from the beginning"),
+        ("Turn a blind eye", "To pretend not to see something")
+    ]
     
-    if is_review_word:
-        message += "📝 *REVIEW WORD* 📝\n\n"
+    # Get a random phrase that hasn't been sent before
+    daily_phrase, phrase_meaning = vocab_manager.get_random_phrase(daily_phrases)
     
-    message += f"*Word*: {word.upper()}\n"
-    message += f"*Definition*: {definition}\n"
-    message += f"*Difficulty*: {difficulty_stars} ({difficulty}/10)\n\n"
-    message += f"*Example*: _{example}_\n\n"
-    
-    # Add progress information
-    message += f"*Progress*: {learned} words learned, {mastered} mastered\n"
-    message += f"{progress_bar}\n\n"
-    
-    # Add review instructions
-    if is_review_word:
-        message += "💡 *Did you remember this word?*\n"
-        message += "Reply with YES or NO to update your review schedule."
+    # Generate context tip with more variety
+    if word_family["synonyms"]:
+        synonyms = word_family['synonyms'][:2]
+        context_tip = f"Think of it like {', '.join(synonyms)} - they share similar vibes!"
+    elif word_family["antonyms"]:
+        antonyms = word_family['antonyms'][:2]
+        context_tip = f"Opposite of {', '.join(antonyms)} - helps to understand by contrast!"
     else:
-        message += "💡 This word will be added to your review queue to help you remember it."
+        context_tip = f"This word often appears in academic and professional contexts"
+    
+    # Format the message with the requested template
+    message = f"📅 Date: {today}  \n"
+    message += f"📦 Word Capsule #{word_capsule_number}\n\n"
+    message += f"🔤 Word: **{word.upper()}**  \n"
+    message += f"📚 Meaning: {definition}  \n"
+    message += f"✍️ Example: \"{example}\"  \n"
+    message += f"💭 Context Tip: {context_tip}\n\n"
+    message += f"🌟 Daily Phrase: \"{daily_phrase}\"  \n"
+    message += f"💡 Meaning: {phrase_meaning}"
     
     # Send the message
     success = whatsapp_sender.send_message(message)
     
     if success:
-        # Mark as sent only if the message was sent successfully
-        if not is_review_word:
-            vocab_manager.mark_as_sent(vocab, today)
-        print(f"Sent vocabulary '{word}' on {today}")
+        # Mark both vocab and phrase as sent only if the message was sent successfully
+        vocab_manager.mark_as_sent(vocab, today)
+        vocab_manager.mark_phrase_as_sent(daily_phrase)
+        print(f"Sent vocabulary '{word}' and phrase '{daily_phrase}' on {today}")
     else:
         print(f"Failed to send vocabulary on {today}")
-
-def review_words():
-    """Send words that need review today"""
-    vocab_manager = VocabManager()
-    review_words = vocab_manager.get_review_words()
-    
-    if review_words:
-        print(f"Sending {len(review_words)} words for review...")
-        send_daily_vocab(is_review=True)
-    else:
-        print("No words to review today.")
-
-def manual_send():
-    """Manually send a vocabulary word (for testing)"""
-    print("Sending vocabulary word now...")
-    send_daily_vocab()
-
-def interactive_mode():
-    """Run in interactive mode for direct feedback"""
-    vocab_manager = VocabManager()
-    
-    print("\n===== VOCABULARY TRAINER INTERACTIVE MODE =====")
-    print(f"Total words: {vocab_manager.get_vocab_count()}")
-    print(f"Words learned: {len(vocab_manager.history['sent_vocabs'])}")
-    print(f"Words mastered: {vocab_manager.get_mastered_count()}")
-    print(f"Words in review queue: {len(vocab_manager.history['review_queue'])}")
-    print("=============================================\n")
-    
-    while True:
-        print("\nOptions:")
-        print("1. Get a new random word")
-        print("2. Review a word due today")
-        print("3. View learning statistics")
-        print("4. Exit")
-        
-        choice = input("\nEnter your choice (1-4): ")
-        
-        if choice == '1':
-            vocab = vocab_manager.get_random_vocab()
-            word = vocab.split(' - ')[0]
-            definition = vocab.split(' - ')[1]
-            
-            print(f"\nWord: {word}")
-            print(f"Definition: {definition}")
-            
-            remember = input("\nDid you know this word? (yes/no): ").lower()
-            if remember in ('yes', 'y'):
-                vocab_manager.update_review_schedule(vocab, remembered=True)
-                print("Great! This word will be reviewed later.")
-            else:
-                vocab_manager.update_review_schedule(vocab, remembered=False)
-                print("No problem! You'll see this word again soon.")
-                
-            vocab_manager.mark_as_sent(vocab, datetime.datetime.now().strftime("%Y-%m-%d"))
-            
-        elif choice == '2':
-            review_words = vocab_manager.get_review_words()
-            if not review_words:
-                print("\nNo words to review today!")
-                continue
-                
-            vocab = random.choice(review_words)
-            word = vocab.split(' - ')[0]
-            
-            print(f"\nReview word: {word}")
-            input("Press Enter to see the definition...")
-            
-            definition = vocab.split(' - ')[1]
-            print(f"Definition: {definition}")
-            
-            remember = input("\nDid you remember this correctly? (yes/no): ").lower()
-            if remember in ('yes', 'y'):
-                vocab_manager.update_review_schedule(vocab, remembered=True)
-                print("Excellent! This word will be reviewed less frequently now.")
-            else:
-                vocab_manager.update_review_schedule(vocab, remembered=False)
-                print("You'll see this word again soon to help you remember it.")
-                
-        elif choice == '3':
-            print("\n===== LEARNING STATISTICS =====")
-            print(f"Total vocabulary words: {vocab_manager.get_vocab_count()}")
-            print(f"Words seen at least once: {len(vocab_manager.history['sent_vocabs'])}")
-            print(f"Words in review queue: {len(vocab_manager.history['review_queue'])}")
-            print(f"Words mastered: {vocab_manager.get_mastered_count()}")
-            
-            progress = len(vocab_manager.history['sent_vocabs']) / vocab_manager.get_vocab_count() * 100
-            print(f"Learning progress: {progress:.1f}%")
-            print("==============================")
-            
-        elif choice == '4':
-            print("\nExiting interactive mode. Goodbye!")
-            break
-            
-        else:
-            print("\nInvalid choice. Please try again.")
-
-def is_github_actions():
-    """Check if running in GitHub Actions environment"""
-    return os.environ.get('GITHUB_ACTIONS') == 'true'
 
 def main():
     """Main function to run the vocabulary sender"""
     parser = argparse.ArgumentParser(description='Send vocabulary words via WhatsApp')
     parser.add_argument('--send', action='store_true', help='Send a vocabulary word now')
-    parser.add_argument('--review', action='store_true', help='Review words from the last 7 days')
-    parser.add_argument('--interactive', action='store_true', help='Run in interactive mode')
-    parser.add_argument('--time', type=str, default="08:00", help='Daily sending time in 24-hour format (default: 08:00)')
     args = parser.parse_args()
     
     if args.send:
         send_daily_vocab()
-    elif args.review:
-        review_words()
-    elif args.interactive:
-        interactive_mode()
     else:
         # Schedule daily vocabulary at 8:00 AM IST
-        schedule.every().day.at(args.time).do(send_daily_vocab)
+        schedule.every().day.at("08:00").do(send_daily_vocab)
         
-        # Schedule review check 30 minutes after main send
-        review_time = (datetime.datetime.strptime(args.time, "%H:%M") + datetime.timedelta(minutes=30)).strftime("%H:%M")
-        schedule.every().day.at(review_time).do(review_words)
-        
-        print(f"Scheduler started. Messages will be sent at {args.time} IST. Press Ctrl+C to exit.")
+        print("Scheduler started. Messages will be sent at 8:00 AM IST. Press Ctrl+C to exit.")
         while True:
             schedule.run_pending()
             time.sleep(60)

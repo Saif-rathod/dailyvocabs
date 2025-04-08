@@ -1,20 +1,47 @@
 import os
+import logging
 from dotenv import load_dotenv
 from twilio.rest import Client
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
 class WhatsAppSender:
     def __init__(self):
+        """Initialize WhatsApp sender with Twilio credentials"""
         self.account_sid = os.getenv("TWILIO_ACCOUNT_SID")
         self.auth_token = os.getenv("TWILIO_AUTH_TOKEN")
         self.twilio_whatsapp_number = os.getenv("TWILIO_WHATSAPP_NUMBER")
         self.recipient_number = os.getenv("RECIPIENT_WHATSAPP_NUMBER")
         
+        # Validate credentials on initialization
+        if not self._validate_credentials():
+            logger.error("Twilio credentials are missing or invalid")
+        
+    def _validate_credentials(self):
+        """Validate that all required credentials are present"""
+        required_credentials = [
+            ("TWILIO_ACCOUNT_SID", self.account_sid),
+            ("TWILIO_AUTH_TOKEN", self.auth_token),
+            ("TWILIO_WHATSAPP_NUMBER", self.twilio_whatsapp_number),
+            ("RECIPIENT_WHATSAPP_NUMBER", self.recipient_number)
+        ]
+        
+        missing = [name for name, value in required_credentials if not value]
+        if missing:
+            logger.error(f"Missing credentials: {', '.join(missing)}")
+            return False
+        return True
+        
     def send_message(self, message):
         """Send a message via Twilio's WhatsApp API"""
-        if not all([self.account_sid, self.auth_token, self.twilio_whatsapp_number, self.recipient_number]):
-            print("ERROR: Twilio credentials not found. Please set them in .env file.")
+        if not self._validate_credentials():
             return False
             
         try:
@@ -32,8 +59,8 @@ class WhatsAppSender:
                 to=to_whatsapp
             )
             
-            print(f"Message sent successfully with SID: {message.sid}")
+            logger.info(f"Message sent successfully with SID: {message.sid}")
             return True
         except Exception as e:
-            print(f"Error sending message: {e}")
+            logger.error(f"Error sending message: {str(e)}")
             return False 

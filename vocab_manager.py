@@ -26,25 +26,21 @@ class VocabManager:
             return {
                 "sent_vocabs": [], 
                 "last_sent_date": None,
-                "review_queue": [],
-                "mastered_vocabs": []
+                "sent_phrases": []
             }
         
         try:
             with open(self.history_file, 'r', encoding='utf-8') as f:
                 history = json.load(f)
                 # Ensure all required fields exist
-                if "review_queue" not in history:
-                    history["review_queue"] = []
-                if "mastered_vocabs" not in history:
-                    history["mastered_vocabs"] = []
+                if "sent_phrases" not in history:
+                    history["sent_phrases"] = []
                 return history
         except json.JSONDecodeError:
             return {
                 "sent_vocabs": [], 
                 "last_sent_date": None,
-                "review_queue": [],
-                "mastered_vocabs": []
+                "sent_phrases": []
             }
             
     def _save_history(self):
@@ -52,92 +48,11 @@ class VocabManager:
         with open(self.history_file, 'w', encoding='utf-8') as f:
             json.dump(self.history, f, indent=2)
     
-    def get_word_difficulty(self, word):
-        """Estimate word difficulty based on length, rarity, and complexity"""
-        # Simple heuristic - longer words tend to be harder
-        length_score = min(len(word) / 15, 1) * 3
-        
-        # Words with less common letters are likely harder
-        uncommon_letters = sum(1 for c in word if c in 'jkqxzvw')
-        letter_score = min(uncommon_letters / 3, 1) * 3
-        
-        # More syllables usually means harder words
-        vowel_groups = len(re.findall(r'[aeiouy]+', word.lower()))
-        syllable_score = min(vowel_groups / 5, 1) * 4
-        
-        # Calculate final score (1-10)
-        difficulty = (length_score + letter_score + syllable_score) + 1
-        return min(round(difficulty), 10)
-    
-    def add_to_review_queue(self, vocab, days_until_review=1):
-        """Add a word to the spaced repetition review queue"""
-        review_date = (datetime.datetime.now() + 
-                      datetime.timedelta(days=days_until_review)).strftime("%Y-%m-%d")
-        
-        # Add to review queue
-        self.history["review_queue"].append({
-            "vocab": vocab,
-            "review_date": review_date,
-            "times_reviewed": 0
-        })
-        self._save_history()
-    
-    def get_review_words(self):
-        """Get words that need to be reviewed today"""
-        today = datetime.datetime.now().strftime("%Y-%m-%d")
-        review_words = []
-        
-        # Find words due for review
-        for item in self.history["review_queue"]:
-            if item["review_date"] <= today:
-                review_words.append(item["vocab"])
-                
-        return review_words
-    
-    def update_review_schedule(self, vocab, remembered=True):
-        """Update the review schedule for a word based on spaced repetition algorithm"""
-        for i, item in enumerate(self.history["review_queue"]):
-            if item["vocab"] == vocab:
-                # Increase review count
-                item["times_reviewed"] += 1
-                
-                # Calculate next review date using spaced repetition
-                if remembered:
-                    # If remembered, increase interval exponentially
-                    days_until_next = 2 ** item["times_reviewed"]
-                    
-                    # If reviewed successfully 5+ times, consider it mastered
-                    if item["times_reviewed"] >= 5:
-                        self.history["mastered_vocabs"].append(vocab)
-                        self.history["review_queue"].pop(i)
-                        self._save_history()
-                        return
-                else:
-                    # If forgotten, reset to 1 day
-                    days_until_next = 1
-                    item["times_reviewed"] = max(0, item["times_reviewed"] - 1)
-                
-                # Cap at 90 days
-                days_until_next = min(days_until_next, 90)
-                
-                # Set next review date
-                item["review_date"] = (datetime.datetime.now() + 
-                                     datetime.timedelta(days=days_until_next)).strftime("%Y-%m-%d")
-                break
-                
-        self._save_history()
-            
     def get_random_vocab(self):
         """Get a random vocabulary that hasn't been sent yet"""
-        # First check if we have words to review today
-        review_words = self.get_review_words()
-        if review_words:
-            return random.choice(review_words)
-        
-        # If no reviews, send a new word
         available_vocabs = [v for v in self.vocabs if v not in self.history["sent_vocabs"]]
         
-        # If all vocabs have been sent, reset history but keep review queue
+        # If all vocabs have been sent, reset history
         if not available_vocabs:
             print("All vocabularies have been sent. Resetting history.")
             self.history["sent_vocabs"] = []
@@ -147,10 +62,22 @@ class VocabManager:
         random_vocab = random.choice(available_vocabs)
         return random_vocab
     
+    def get_random_phrase(self, phrases):
+        """Get a random phrase that hasn't been sent yet"""
+        available_phrases = [p for p in phrases if p[0] not in self.history["sent_phrases"]]
+        
+        # If all phrases have been sent, reset history
+        if not available_phrases:
+            print("All phrases have been sent. Resetting history.")
+            self.history["sent_phrases"] = []
+            available_phrases = phrases
+            
+        # Return a random phrase from available ones
+        random_phrase = random.choice(available_phrases)
+        return random_phrase
+    
     def generate_example_sentence(self, word):
         """Generate a simple example sentence for the word"""
-        # This is a simple template-based approach
-        # In a production app, you might use an API for better examples
         templates = [
             f"The {word} was evident in his speech.",
             f"Her {word} attitude surprised everyone.",
@@ -159,16 +86,25 @@ class VocabManager:
             f"Being {word} is an important quality in this profession."
         ]
         return random.choice(templates)
+    
+    def get_word_family(self, word):
+        """Get synonyms and antonyms for the word"""
+        # This is a simple placeholder implementation
+        # In a production app, you might use a thesaurus API
+        return {
+            "synonyms": [],
+            "antonyms": []
+        }
         
     def mark_as_sent(self, vocab, sent_date):
         """Mark a vocabulary as sent with the date"""
         self.history["sent_vocabs"].append(vocab)
         self.history["last_sent_date"] = sent_date
+        self._save_history()
         
-        # Also add to review queue for spaced repetition
-        word = vocab.split(' - ')[0]
-        self.add_to_review_queue(vocab)
-        
+    def mark_phrase_as_sent(self, phrase):
+        """Mark a phrase as sent"""
+        self.history["sent_phrases"].append(phrase)
         self._save_history()
         
     def get_vocab_count(self):
@@ -177,8 +113,4 @@ class VocabManager:
         
     def get_remaining_count(self):
         """Return the number of vocabularies that haven't been sent yet"""
-        return len(self.vocabs) - len(self.history["sent_vocabs"])
-        
-    def get_mastered_count(self):
-        """Return the number of mastered vocabularies"""
-        return len(self.history["mastered_vocabs"]) 
+        return len(self.vocabs) - len(self.history["sent_vocabs"]) 
