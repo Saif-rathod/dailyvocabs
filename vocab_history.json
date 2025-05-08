@@ -30,9 +30,10 @@
     "ephemeral - lasting for a very short time",
     "temerity - excessive confidence or boldness; audacity",
     "efficacious - effective as a means, remedy, or action",
-    "zenith - the time at which something is most powerful or successful"
+    "zenith - the time at which something is most powerful or successful",
+    "caustic - sarcastic in a scathing and bitter way"
   ],
-  "last_sent_date": "2025-05-07",
+  "last_sent_date": "2025-05-08",
   "sent_phrases": [
     "Kill time",
     "Strike gold",
@@ -64,6 +65,7 @@
     "The ball is in your court",
     "Pull someone's leg",
     "Over the hill",
-    "Hit the jackpot"
+    "Hit the jackpot",
+    "Throw in the towel"
   ]
 }
