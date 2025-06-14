@@ -1,9 +1,10 @@
 {
   "sent_vocabs": [
     "sapient - wise, or attempting to appear wise",
-    "equivocate - use ambiguous language to conceal the truth or avoid commitment"
+    "equivocate - use ambiguous language to conceal the truth or avoid commitment",
+    "arduous - involving or requiring strenuous effort; difficult and tiring"
   ],
-  "last_sent_date": "2025-06-13",
+  "last_sent_date": "2025-06-14",
   "sent_phrases": [
     "On top of the world",
     "Hit the jackpot",
@@ -12,6 +13,7 @@
     "Get the picture",
     "Beat around the bush",
     "Burning the midnight oil",
-    "From time to time"
+    "From time to time",
+    "In the blink of an eye"
   ]
 }
