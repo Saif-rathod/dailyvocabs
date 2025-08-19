@@ -1,9 +1,10 @@
 {
   "sent_vocabs": [
     "recalcitrant - having an obstinately uncooperative attitude",
-    "sycophant - a person who acts obsequiously toward someone to gain advantage"
+    "sycophant - a person who acts obsequiously toward someone to gain advantage",
+    "ubiquitous - present, appearing, or found everywhere"
   ],
-  "last_sent_date": "2025-08-18",
+  "last_sent_date": "2025-08-19",
   "sent_phrases": [
     "Go the extra mile",
     "In the nick of time",
@@ -18,6 +19,7 @@
     "In seventh heaven",
     "Up a creek without a paddle",
     "A walk in the park",
-    "Light at the end of the tunnel"
+    "Light at the end of the tunnel",
+    "Pull your weight"
   ]
 }
