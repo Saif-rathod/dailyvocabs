@@ -19,9 +19,10 @@
     "inimical - tending to obstruct or harm",
     "perfunctory - carried out with minimal effort",
     "serendipity - the occurrence of events by chance in a happy or beneficial way",
-    "enigmatic - difficult to interpret or understand; mysterious"
+    "enigmatic - difficult to interpret or understand; mysterious",
+    "obfuscate - to deliberately make something unclear or difficult to understand"
   ],
-  "last_sent_date": "2025-09-05",
+  "last_sent_date": "2025-09-06",
   "sent_phrases": [
     "Go the extra mile",
     "In the nick of time",
@@ -54,6 +55,7 @@
     "Get straight to the point",
     "Over the hill",
     "A tough nut to crack",
-    "Between a rock and a hard place"
+    "Between a rock and a hard place",
+    "Go back to square one"
   ]
 }
