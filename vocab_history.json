@@ -36,9 +36,10 @@
     "jettison - throw or drop from an aircraft or ship",
     "sapient - wise, or attempting to appear wise",
     "abeyance - a state of temporary disuse or suspension",
-    "nefarious - wicked or criminal"
+    "nefarious - wicked or criminal",
+    "pernicious - having a harmful effect, especially in a gradual or subtle way"
   ],
-  "last_sent_date": "2025-09-22",
+  "last_sent_date": "2025-09-23",
   "sent_phrases": [
     "Go the extra mile",
     "In the nick of time",
@@ -88,6 +89,7 @@
     "Jump on the bandwagon",
     "Beat around the bush",
     "On a roll",
-    "Under the weather"
+    "Under the weather",
+    "Break a leg"
   ]
 }
