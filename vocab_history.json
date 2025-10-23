@@ -1,8 +1,9 @@
 {
   "sent_vocabs": [
-    "obsequious - obedient or attentive to an excessive degree"
+    "obsequious - obedient or attentive to an excessive degree",
+    "abstruse - difficult to understand; obscure"
   ],
-  "last_sent_date": "2025-10-22",
+  "last_sent_date": "2025-10-23",
   "sent_phrases": [
     "Fit as a fiddle",
     "Spill the beans",
@@ -22,6 +23,7 @@
     "Hit the jackpot",
     "Read between the lines",
     "Walking on air",
-    "Break a leg"
+    "Break a leg",
+    "A piece of cake"
   ]
 }
