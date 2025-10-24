@@ -1,9 +1,10 @@
 {
   "sent_vocabs": [
     "obsequious - obedient or attentive to an excessive degree",
-    "abstruse - difficult to understand; obscure"
+    "abstruse - difficult to understand; obscure",
+    "recondite - difficult to understand or obscure; abstruse"
   ],
-  "last_sent_date": "2025-10-23",
+  "last_sent_date": "2025-10-24",
   "sent_phrases": [
     "Fit as a fiddle",
     "Spill the beans",
@@ -24,6 +25,7 @@
     "Read between the lines",
     "Walking on air",
     "Break a leg",
-    "A piece of cake"
+    "A piece of cake",
+    "Let the cat out of the bag"
   ]
 }
