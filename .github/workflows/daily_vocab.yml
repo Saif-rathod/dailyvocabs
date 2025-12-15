@@ -1,48 +1,48 @@
-name: Daily Vocabulary Sender
+# name: Daily Vocabulary Sender
 
-on:
-  schedule:
-    # Run daily at 2:30 AM UTC (8:00 AM IST)
-    - cron: '30 2 * * *'
-  workflow_dispatch:
-    # Allow manual triggering
+# on:
+#   schedule:
+#     # Run daily at 2:30 AM UTC (8:00 AM IST)
+#     - cron: '30 2 * * *'
+#   workflow_dispatch:
+#     # Allow manual triggering
 
-# Ensure the workflow has write permissions to the repository
-permissions:
-  contents: write
+# # Ensure the workflow has write permissions to the repository
+# permissions:
+#   contents: write
 
-jobs:
-  send-vocab:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          # Fetch full history for proper git commits
-          fetch-depth: 0
+# jobs:
+#   send-vocab:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+#         with:
+#           # Fetch full history for proper git commits
+#           fetch-depth: 0
       
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.10'
       
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
       
-      - name: Send daily vocabulary and phrase
-        env:
-          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_WHATSAPP_NUMBER: ${{ secrets.TWILIO_WHATSAPP_NUMBER }}
-          RECIPIENT_WHATSAPP_NUMBER: ${{ secrets.RECIPIENT_WHATSAPP_NUMBER }}
-        run: python main.py --send
+#       - name: Send daily vocabulary and phrase
+#         env:
+#           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+#           TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+#           TWILIO_WHATSAPP_NUMBER: ${{ secrets.TWILIO_WHATSAPP_NUMBER }}
+#           RECIPIENT_WHATSAPP_NUMBER: ${{ secrets.RECIPIENT_WHATSAPP_NUMBER }}
+#         run: python main.py --send
       
-      - name: Update repository with sent words and phrases
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add vocab_history.json
-          git commit -m "Update vocabulary and phrase history"
-          git push 
+#       - name: Update repository with sent words and phrases
+#         run: |
+#           git config --local user.email "action@github.com"
+#           git config --local user.name "GitHub Action"
+#           git add vocab_history.json
+#           git commit -m "Update vocabulary and phrase history"
+#           git push 
